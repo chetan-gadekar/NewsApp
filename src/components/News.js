@@ -23,7 +23,6 @@ export class News extends Component {
 
   constructor(props) {
     super(props);
-    console.log("Hello");
     this.state = {
       articles: [],
       loading: false,
@@ -34,51 +33,47 @@ export class News extends Component {
   }
 
   async updateNews() {
-    console.log("Cdm");
     let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=3faf3ee5333e4417b7295bcb357da07b&page=${this.state.page}&pageSize=${this.props.pageSize}`;
-    this.setState({ loading: true });
+    this.setState({loading:true});
     let data = await fetch(url);
     let parseData = await data.json();
-    // console.log(parseData);
     this.setState({
       articles: parseData.articles,
       totalResults: parseData.totalResults,
       loading: false,
+      // page:this.state.page + 1
     });
   }
-
-  handlenextclick = async () => {
-    this.setState({ page: this.state.page + 1 });
-    this.updateNews();
-  };
-
-  handlepreclick = async () => {
-    this.setState({ page: this.state.page - 1 });
-    this.updateNews();
-  };
 
   async componentDidMount() {
     this.updateNews();
   }
 
-  fetchMoreData = () => {
-    this.setState({page:this.state.page+1})
-    this.updateNews();
+   fetchMoreData = async () => {
+    this.setState({page:this.state.page + 1})
+    let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=3faf3ee5333e4417b7295bcb357da07b&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    let data = await fetch(url);
+    let parseData = await data.json();
+    this.setState({
+      articles: this.state.articles.concat(parseData.articles),
+      totalResults: parseData.totalResults,
+    });
   };
 
   render() {
     console.log("render");
     return (
-      <div className="container my-3">
-        <h1 className="text-center">NewsMonkey - Top {this.capitalizeFirstLetter(this.props.category)} Hedlines</h1>
-        {/* {this.state.loading && <Spiner />} */}
+      <>
+        <h1 className="text-center my-2">NewsMonkey - Top {this.capitalizeFirstLetter(this.props.category)} Hedlines</h1>
+        {this.state.loading && <Spiner />}
         <InfiniteScroll
           dataLength={this.state.articles.length}
           next={this.fetchMoreData}
-          hasMore={this.state.articles!==this.state.totalResults}
+          hasMore={this.state.articles.length!==this.state.totalResults}
           loader={<Spiner/>}
-        ></InfiniteScroll>
-        <div className="row">
+        >
+          <div className="container">
+          <div className="row">
           {this.state.articles.map((element) => (
               <div className="col-md-4" key={element.url}>
                 <NewsItem
@@ -93,7 +88,9 @@ export class News extends Component {
               </div>
             ))}
         </div>
-      </div>
+        </div>
+        </InfiniteScroll>
+        </>
     );
   }
 }
