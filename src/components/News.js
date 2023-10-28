@@ -61,6 +61,11 @@ export class News extends Component {
     this.updateNews();
   }
 
+  fetchMoreData = () => {
+    this.setState({page:this.state.page+1})
+    this.updateNews();
+  };
+
   render() {
     console.log("render");
     return (
@@ -87,27 +92,6 @@ export class News extends Component {
                 />
               </div>
             ))}
-        </div>
-        <div className="container d-flex justify-content-between">
-          <button
-            disabled={this.state.page <= 1}
-            type="button"
-            className="btn btn-dark"
-            onClick={this.handlepreclick}
-          >
-            &larr; Previous
-          </button>
-          <button
-            disabled={
-              this.state.page + 1 >
-              Math.ceil(this.state.totalResults / this.props.pageSize)
-            }
-            type="button"
-            className="btn btn-dark"
-            onClick={this.handlenextclick}
-          >
-            Next &rarr;
-          </button>
         </div>
       </div>
     );
